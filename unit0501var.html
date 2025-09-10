@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="zh-tw">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JS Variable</title>
+</head>
+<body>
+    <script>
+        //宣告變數
+        // var 關鍵字宣告變數, name 變數名稱, '' 或 "" 表示值為字串, 若之中沒有任何文字稱為空字串。其他數字或布林則不需使用引號。
+        //;表示敘述結束
+
+        var name=''; 
+        var height=0.0; //數值(Number)變數
+        var weight=0.0; 
+        var gender=""; //字串(String)變數
+        var marriage=false; //布林(Boolean)變數, 只有2個值, true/false
+
+        name='愛呆丸';
+        height=170.5;
+        weight=60.4;
+        gender="男";
+        marriage=true;
+
+        //object 物件型別
+        var emp={
+            no:1,
+            name:'拉布布',
+            h:150.5,
+            w:65.0,
+            gender:'女',
+            marriage:false
+        }
+
+        document.write("<h1>BSNET Employee Health Management System</h1>");
+        document.write("<hr>");
+        document.write("姓名：" + name + "<br>");
+        document.write("身高：" + height + " cm<br>");
+        document.write("體重：" + weight + " kg<br>");
+        document.write("性別：" + gender + "<br>");
+        document.write("婚姻：" + marriage + "<br>");
+
+        document.write("<hr>");
+        document.write("姓名：" + emp.name + "<br>");
+        document.write("身高：" + emp.h + " cm<br>");
+        document.write("體重：" + emp.w + " kg<br>");
+        document.write("性別：" + emp.gender + "<br>");
+        document.write("婚姻：" + emp.marriage + "<br>");
+
+        //emp=null; //設為空值
+
+    </script>
+</body>
+</html>

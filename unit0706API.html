@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="zh-tw">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JS API</title>
+</head>
+<body>
+    <h1>查看天氣</h1>
+    <hr>
+    <input type="text" placeholder="城市名稱" id="city"><br>
+    <button onclick="getWeather()">查詢</button>
+    <div id="result"></div>
+
+    <script>
+        async function getWeather() {
+            const city=document.getElementById('city').value;
+            const apikey='76fe7860e64219ed7469586ceae78bfb';
+            const url=`https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apikey}&units=metric&lang=zh_tw`;
+
+            try{
+                const response=await fetch(url);
+                const data=await response.json();
+                if(response.ok){
+                    //const tempCelsius = (data.main.temp - 273.15).toFixed(2);
+                    document.getElementById('result').innerHTML=`
+                        <h3>${data.name} 天氣 </h3>
+                        <p>溫度：${data.main.temp}°C</p>
+                        <p>天氣：${data.weather[0].description}</p>
+                    `;
+                    console.log(data);
+                }else{
+                    document.getElementById('result').innerHTML=`Error：${data.message}`;
+                }
+            }catch{
+                document.getElementById('result').innerHTML=`Error, Try again!`;
+            }
+        }
+    </script>
+</body>
+</html>

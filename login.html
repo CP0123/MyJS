@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="zh-tw">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cafe Time Login System</title>
+    <style>
+        input{
+            padding: 0.8em;
+        }
+
+        input:focus{
+            background-color: khaki;
+        }
+
+        input:blur{
+            background-color: inherit;
+        }
+
+        [type=submit]{
+            width: 100%;
+            height: 6em;
+        }
+
+
+    </style>
+</head>
+<body>
+    <form>
+        <table>
+            <tr>
+                <td colspan="3" style="text-align: center;"><h1>登入系統</h1></td>
+            </tr>
+            
+            <tr>
+                <td style="text-align: center;">電子郵件</td>
+                <td><input type="email" name="email" id="email" placeholder="請輸入電子郵件"></td>
+                <td rowspan="2"><input type="submit" value="登入"></td>                
+            </tr>
+
+            <tr>
+                <td style="text-align: center;">密碼</td>
+                <td><input type="password" name="pwd" placeholder="請輸入密碼"></td>
+            </tr>
+        </table>
+    </form>
+</body>
+</html>

@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="zh-tw">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Javascript Condition</title>
+    
+</head>
+<body>
+    <h1>標準體重系統</h1>
+    <hr>
+    <input type="text" placeholder="name" id="name"><br>
+    <input type="number" placeholder="height" id="h"><br>
+    <input type="number" placeholder="weight" id="w"><br>
+    <input type="radio" id="male" name="gender" checked>男
+    <input type="radio" id="female" name="gender">女<br>
+    <button onclick="standard()">測量標準體重</button>
+    <button onclick="BMI()">身體質量指數</button>
+    <p id="result"></p>
+
+    <script>
+        function standard(){
+            var name='';
+            var h=0.0;
+            var w=0.0;
+            var gender='';
+            
+            var std=0.0;   //標準體重
+            var upper=0.0; //體重上限
+            var lower=0.0; //體重下限
+            var waring=''; //警語
+
+            name=document.getElementById('name').value;
+            h=document.getElementById('h').value;
+            w=document.getElementById('w').value;
+
+            if(name==='' || h==0 || w==0){
+                alert("請輸入");
+                return;
+            }
+            
+            if(document.getElementById('male').checked){
+                gender='男';
+                std=(h-80)*0.7;
+            }else{
+                gender='女';
+                std=(h-70)*0.6;
+            }
+
+            upper=std*1.1;
+            lower=std*0.9;
+
+            if(w>upper){
+                waring="胖胖胖";
+            }else if(w<lower){
+                waring="瘦瘦瘦";
+            }else{
+                waring="標準";
+            }
+
+            document.getElementById('result').innerHTML="姓名：" + name + "<br>"
+                                                    +"身高：" + h +" 公分<br>"
+                                                    +"體重：" + w +" 公斤<br>"
+                                                    +"性別：" + gender +"<br>"
+                                                    +"標準體重：" + std.toFixed(2) +" 公斤<br>"
+                                                    +"體重上限：" + upper.toFixed(2) +" 公斤<br>"
+                                                    +"體重下限：" + lower.toFixed(2) +" 公斤<br>"
+                                                    +"小提醒：" + waring +"<br>";
+
+        }
+        function BMI(){
+            var name='';
+            var h=0.0;
+            var w=0.0;
+            var bmi=0.0;
+            var waring='';
+
+            name=document.getElementById('name').value;
+            h=document.getElementById('h').value;
+            w=document.getElementById('w').value;
+
+            if(name==='' || h==0 || w==0){
+                alert("請輸入");
+                return;
+            }
+
+            bmi=w/((h/100)*(h/100));
+            //其他寫法
+            // bmi=w/((h/100)**2);
+            // bmi = w / Math.pow(h / 100, 2);
+
+            if(bmi>=27){
+                waring="肥胖";
+            }else if(bmi>=24){
+                waring="體重過重";
+            }else if(bmi>=18.5){
+                waring="健康體重";
+            }else{
+                waring="體重過輕";
+            }
+
+            /*
+            其他寫法
+            if(bmi<18.5){
+                waring="體重過輕";
+            }else if(bmi<24){
+                waring="健康體重";
+            }else if(bmi<27){
+                waring="體重過重";
+            }else{
+                waring="肥胖";
+            }
+            */
+
+            document.getElementById('result').innerHTML="姓名：" + name + "<br>"
+                                                        +"身高：" + h +" 公分<br>"
+                                                        +"體重：" + w +" 公斤<br>"
+                                                        +"BMI：" + bmi.toFixed(1) +" <br>"
+                                                        +"小提醒：" + waring +"<br>";
+        }
+    </script>
+</body>
+</html>
