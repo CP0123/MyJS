@@ -2,7 +2,7 @@
 <html lang="zh-TW">
 <head>
 <meta charset="UTF-8">
-<title>3x3 拼圖遊戲 - 拖拉版</title>
+<title>3x3 真正拼圖</title>
 <style>
   body {
     display: flex;
@@ -10,137 +10,146 @@
     align-items: center;
     height: 100vh;
     background: #f0f0f0;
-    font-family: sans-serif;
     margin: 0;
-  }
-
-  #puzzle {
-    width: 300px;
-    height: 300px;
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    grid-template-rows: repeat(3, 1fr);
-    gap: 2px;
-    position: relative;
-    touch-action: none; /* 支援觸控拖拉 */
-  }
-
-  .piece {
-    width: 100%;
-    height: 100%;
-    background-image: url('images/Coffee.jpg'); /* 換成你的圖片 */
-    background-size: 300px 300px;
-    border-radius: 8px;
-    cursor: grab;
-    position: relative;
-    z-index: 1;
-    transition: transform 0.2s;
+    user-select: none;
     touch-action: none;
   }
-
-  /* 模擬 jigsaw 凸凹 */
-  #piece-0 { background-position: 0 0; clip-path: polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%); }
-  #piece-1 { background-position: -100px 0; clip-path: polygon(0% 0%, 100% 10%, 100% 100%, 0% 90%); }
-  #piece-2 { background-position: -200px 0; clip-path: polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%); }
-  #piece-3 { background-position: 0 -100px; clip-path: polygon(0% 0%, 100% 0%, 100% 100%, 10% 100%); }
-  #piece-4 { background-position: -100px -100px; clip-path: polygon(0% 10%, 100% 0%, 90% 100%, 10% 90%); }
-  #piece-5 { background-position: -200px -100px; clip-path: polygon(0% 0%, 100% 0%, 100% 100%, 90% 100%); }
-  #piece-6 { background-position: 0 -200px; clip-path: polygon(0% 0%, 100% 0%, 100% 90%, 0% 100%); }
-  #piece-7 { background-position: -100px -200px; clip-path: polygon(0% 10%, 100% 0%, 100% 90%, 0% 100%); }
-  #piece-8 { background-position: -200px -200px; clip-path: polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%); }
+  #puzzle {
+    position: relative;
+    width: 300px;
+    height: 300px;
+    border: 2px solid #333;
+    background: #fff;
+  }
+  .piece {
+    position: absolute;
+    cursor: grab;
+    touch-action: none;
+    transition: transform 0.2s;
+  }
 </style>
 </head>
 <body>
 
-<div id="puzzle">
-  <div class="piece" id="piece-0" data-index="0"></div>
-  <div class="piece" id="piece-1" data-index="1"></div>
-  <div class="piece" id="piece-2" data-index="2"></div>
-  <div class="piece" id="piece-3" data-index="3"></div>
-  <div class="piece" id="piece-4" data-index="4"></div>
-  <div class="piece" id="piece-5" data-index="5"></div>
-  <div class="piece" id="piece-6" data-index="6"></div>
-  <div class="piece" id="piece-7" data-index="7"></div>
-  <div class="piece" id="piece-8" data-index="8"></div>
-</div>
+<div id="puzzle"></div>
 
 <script>
+const PUZZLE_SIZE = 300;
+const ROWS = 3;
+const COLS = 3;
+const pieceSize = PUZZLE_SIZE / ROWS;
 const puzzle = document.getElementById('puzzle');
-const pieces = Array.from(document.querySelectorAll('.piece'));
 
-// 打亂拼圖
-function shuffle() {
-  pieces.sort(() => Math.random() - 0.5);
-  pieces.forEach(piece => puzzle.appendChild(piece));
+// 圖片來源
+const imgSrc = 'https://picsum.photos/300/300'; // 可換成你想要的圖片
+
+// 生成拼圖
+function createPuzzle(img) {
+  const pieces = [];
+  for (let r = 0; r < ROWS; r++) {
+    for (let c = 0; c < COLS; c++) {
+      const canvas = document.createElement('canvas');
+      canvas.width = pieceSize;
+      canvas.height = pieceSize;
+      canvas.classList.add('piece');
+      canvas.dataset.row = r;
+      canvas.dataset.col = c;
+
+      const ctx = canvas.getContext('2d');
+
+      // 先填背景透明
+      ctx.clearRect(0,0,pieceSize,pieceSize);
+
+      // 畫拼圖形狀（簡單凸凹示意）
+      ctx.beginPath();
+      const ear = pieceSize/4;
+      if(r>0) ctx.moveTo(0, ear);
+      else ctx.moveTo(0,0);
+      ctx.lineTo(pieceSize,0);
+      ctx.lineTo(pieceSize, pieceSize);
+      ctx.lineTo(0,pieceSize);
+      ctx.closePath();
+      ctx.clip();
+
+      ctx.drawImage(
+        img,
+        c*pieceSize, r*pieceSize, pieceSize, pieceSize,
+        0,0,pieceSize,pieceSize
+      );
+
+      // 初始隨機位置
+      canvas.style.left = Math.random()*(PUZZLE_SIZE-pieceSize)+'px';
+      canvas.style.top = Math.random()*(PUZZLE_SIZE-pieceSize)+'px';
+
+      puzzle.appendChild(canvas);
+      pieces.push(canvas);
+    }
+  }
+  makeDraggable(pieces);
 }
-shuffle();
 
-// 追蹤拖拉
-let dragging = null;
-let offsetX = 0;
-let offsetY = 0;
+// 拖拉功能
+function makeDraggable(pieces){
+  let dragging = null;
+  let offsetX = 0;
+  let offsetY = 0;
 
-// Pointer Events 支援滑鼠/觸控
-pieces.forEach(piece => {
-  piece.addEventListener('pointerdown', e => {
-    dragging = piece;
-    offsetX = e.clientX - piece.getBoundingClientRect().left;
-    offsetY = e.clientY - piece.getBoundingClientRect().top;
-    piece.style.zIndex = 1000;
-    piece.setPointerCapture(e.pointerId);
-  });
-
-  piece.addEventListener('pointermove', e => {
-    if (!dragging) return;
-    const x = e.clientX - offsetX - puzzle.getBoundingClientRect().left;
-    const y = e.clientY - offsetY - puzzle.getBoundingClientRect().top;
-    dragging.style.transform = `translate(${x}px, ${y}px)`;
-  });
-
-  piece.addEventListener('pointerup', e => {
-    if (!dragging) return;
-
-    const draggingRect = dragging.getBoundingClientRect();
-    let swapped = false;
-
-    pieces.forEach(target => {
-      if (target === dragging) return;
-      const rect = target.getBoundingClientRect();
-      if (
-        e.clientX > rect.left &&
-        e.clientX < rect.right &&
-        e.clientY > rect.top &&
-        e.clientY < rect.bottom
-      ) {
-        // 交換 DOM 位置
-        const temp = document.createElement('div');
-        puzzle.insertBefore(temp, target);
-        puzzle.insertBefore(target, dragging);
-        puzzle.insertBefore(dragging, temp);
-        temp.remove();
-        swapped = true;
-      }
+  pieces.forEach(piece => {
+    piece.addEventListener('pointerdown', e=>{
+      dragging = piece;
+      offsetX = e.clientX - piece.offsetLeft;
+      offsetY = e.clientY - piece.offsetTop;
+      piece.style.zIndex = 1000;
+      piece.setPointerCapture(e.pointerId);
     });
 
-    // 重置位置
-    dragging.style.transform = '';
-    dragging.style.zIndex = 1;
-    dragging.releasePointerCapture(e.pointerId);
-    dragging = null;
+    piece.addEventListener('pointermove', e=>{
+      if(!dragging) return;
+      let x = e.clientX - offsetX;
+      let y = e.clientY - offsetY;
+      dragging.style.left = x + 'px';
+      dragging.style.top = y + 'px';
+    });
 
-    checkWin();
+    piece.addEventListener('pointerup', e=>{
+      if(!dragging) return;
+      // 吸附到格子
+      const row = parseInt(dragging.dataset.row);
+      const col = parseInt(dragging.dataset.col);
+      const targetX = col * pieceSize;
+      const targetY = row * pieceSize;
+      const dx = dragging.offsetLeft - targetX;
+      const dy = dragging.offsetTop - targetY;
+      if(Math.hypot(dx, dy) < pieceSize/2){
+        dragging.style.left = targetX+'px';
+        dragging.style.top = targetY+'px';
+      }
+      dragging.style.zIndex = 1;
+      dragging.releasePointerCapture(e.pointerId);
+      dragging = null;
+      checkWin(pieces);
+    });
   });
-});
+}
 
 // 判斷完成
-function checkWin() {
-  const ids = Array.from(puzzle.children).map(p => p.dataset.index);
-  if (ids.join(',') === '0,1,2,3,4,5,6,7,8') {
-    setTimeout(() => alert('恭喜完成拼圖！'), 100);
+function checkWin(pieces){
+  const completed = pieces.every(p=>{
+    const row = parseInt(p.dataset.row);
+    const col = parseInt(p.dataset.col);
+    return parseInt(p.style.left) === col*pieceSize && parseInt(p.style.top) === row*pieceSize;
+  });
+  if(completed){
+    setTimeout(()=>alert('恭喜完成拼圖！'), 100);
   }
 }
+
+// 載入圖片後建立拼圖
+const img = new Image();
+img.crossOrigin = "Anonymous";
+img.src = imgSrc;
+img.onload = ()=> createPuzzle(img);
 </script>
 
 </body>
 </html>
-
